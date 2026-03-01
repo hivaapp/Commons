@@ -9,18 +9,18 @@ import { useCommunityHistory } from '../../hooks/community/useCommunityHistory';
 
 // ---------- Types ----------
 
-type FilterKey = 'all' | 'approved' | 'pending_review' | 'rejected';
+type FilterKey = 'all' | 'approved' | 'submitted' | 'rejected';
 
 const FILTER_TABS: { key: FilterKey; label: string }[] = [
     { key: 'all', label: 'All' },
     { key: 'approved', label: 'Approved' },
-    { key: 'pending_review', label: 'Pending' },
+    { key: 'submitted', label: 'Pending' },
     { key: 'rejected', label: 'Rejected' },
 ];
 
 const statusBadge: Record<string, { variant: 'success' | 'warning' | 'error' | 'neutral'; label: string }> = {
     approved: { variant: 'success', label: 'Approved' },
-    pending_review: { variant: 'warning', label: 'Pending' },
+    submitted: { variant: 'warning', label: 'Pending' },
     rejected: { variant: 'error', label: 'Rejected' },
     in_progress: { variant: 'neutral', label: 'In progress' },
 };
@@ -84,7 +84,7 @@ export default function CommunityHistory() {
             ) : (
                 <div className="mt-1 divide-y divide-commons-border">
                     {taskList.map((t) => {
-                        const badge = statusBadge[t.status] ?? statusBadge.in_progress;
+                        const badge = statusBadge[t.status ?? 'in_progress'] ?? statusBadge.in_progress;
                         const campaignTitle = (t.campaigns as any)?.title ?? 'Task';
                         const brandName = (t.campaigns as any)?.brand_profiles?.company_name ?? '';
                         const isRejected = t.status === 'rejected';

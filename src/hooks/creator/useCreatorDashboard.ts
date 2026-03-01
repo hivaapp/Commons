@@ -8,18 +8,26 @@ import { useAuthStore } from '../../store/auth';
 export function useCreatorDashboard() {
     const { user } = useAuthStore();
 
-    // Creator profile stats
+    // Creator profile stats via RPC + trust_score from table
     const stats = useQuery({
         queryKey: ['creator-dashboard-stats', user?.id],
         enabled: !!user?.id,
         queryFn: async () => {
-            const { data, error } = await supabase
-                .from('creator_profiles')
-                .select('trust_score, activation_rate, total_earned_paise, total_community_earned_paise')
-                .eq('id', user!.id)
-                .single();
-            if (error) throw error;
-            return data;
+            const [rpcResult, profileResult] = await Promise.all([
+                supabase
+                    .rpc('get_creator_dashboard_stats', { p_creator_id: user!.id })
+                    .single(),
+                supabase
+                    .from('creator_profiles')
+                    .select('trust_score')
+                    .eq('id', user!.id)
+                    .single(),
+            ]);
+            if (rpcResult.error) throw rpcResult.error;
+            return {
+                ...rpcResult.data,
+                trust_score: profileResult.data?.trust_score ?? 0,
+            };
         },
     });
 

@@ -18,7 +18,7 @@ type TabKey = 'overview' | 'results' | 'insights' | 'billing';
 
 const statusBadgeMap: Record<string, { variant: 'success' | 'warning' | 'error' | 'neutral'; label: string }> = {
     approved: { variant: 'success', label: 'Approved' },
-    pending_review: { variant: 'warning', label: 'Pending' },
+    submitted: { variant: 'warning', label: 'Pending' },
     rejected: { variant: 'error', label: 'Rejected' },
     in_progress: { variant: 'neutral', label: 'In progress' },
 };
@@ -65,7 +65,7 @@ function OverviewTabContent({ campaign }: { campaign: any }) {
                 {[
                     { label: 'Campaign type', value: c.campaign_type ?? '—' },
                     { label: 'Per task reward', value: formatRupeesExact(c.per_task_paise ?? 0) },
-                    { label: 'Estimated time', value: c.estimated_minutes ? `${c.estimated_minutes} min` : '—' },
+                    { label: 'Estimated time', value: c.task_duration_minutes ? `${c.task_duration_minutes} min` : '—' },
                     { label: 'Ends', value: c.ends_at ? formatDate(c.ends_at) : '—' },
                 ].map((row) => (
                     <div key={row.label} className="flex items-center justify-between">
@@ -85,7 +85,7 @@ function LiveResultsTabContent({ campaign, tasks }: { campaign: any; tasks: any[
     const pct = target > 0 ? Math.round((participants / target) * 100) : 0;
 
     const approvedCount = tasks.filter((t) => t.status === 'approved').length;
-    const pendingCount = tasks.filter((t) => t.status === 'pending_review').length;
+    const pendingCount = tasks.filter((t) => t.status === 'submitted').length;
     const rejectedCount = tasks.filter((t) => t.status === 'rejected').length;
     const inProgressCount = tasks.filter((t) => t.status === 'in_progress').length;
 
@@ -425,7 +425,7 @@ export default function BrandCampaignDetail() {
 
     const c = campaign.data;
     const taskList = tasks.data ?? [];
-    const status = campaignStatusMap[c.status] ?? campaignStatusMap.active;
+    const status = campaignStatusMap[c.status ?? 'active'] ?? campaignStatusMap.active;
     const creatorHandle = (c.creator_profiles as any)?.handle ?? '';
 
     const daysLeft = c.ends_at

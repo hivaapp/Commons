@@ -788,7 +788,6 @@ export default function BrandCampaignNew() {
             const communityBudget = Math.round(budget * 0.64);
             const perTaskPaise = participants > 0 ? Math.round(communityBudget / participants) : 0;
             const creatorFeePaise = Math.round(budget * 0.20);
-            const platformFeePaise = budget - communityBudget - creatorFeePaise;
 
             const { data, error } = await supabase
                 .from('campaigns')
@@ -807,7 +806,6 @@ export default function BrandCampaignNew() {
                     proof_type: proofRequired ? proofType : null,
                     creator_fee_paise: creatorFeePaise,
                     creator_fee_rate: 0.20,
-                    platform_fee_paise: platformFeePaise,
                     creator_id: selectedCreator,
                     status: 'draft',
                 })

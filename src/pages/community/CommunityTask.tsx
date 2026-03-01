@@ -36,7 +36,7 @@ interface CampaignData {
     brand_name: string;
     campaign_type: CampaignType;
     payout_amount: number;
-    estimated_minutes: number;
+    task_duration_minutes: number;
     task_min_seconds: number;
     description: string;
     // Research
@@ -67,7 +67,7 @@ function mapCampaignToLocal(row: any): CampaignData | null {
         brand_name: (row.brand_profiles as any)?.company_name ?? '',
         campaign_type: (row.campaign_type ?? 'research').toLowerCase().replace(/\s/g, '_') as CampaignType,
         payout_amount: (row.per_task_paise ?? 0),
-        estimated_minutes: row.estimated_minutes ?? 10,
+        task_duration_minutes: row.task_duration_minutes ?? 10,
         task_min_seconds: row.task_min_seconds ?? 180,
         description: row.description ?? '',
         questions: row.questions as SurveyQuestion[] | undefined,
@@ -720,9 +720,9 @@ export default function CommunityTask() {
                 .select('id, status, started_at, campaign_id')
                 .eq('campaign_id', campaignId!)
                 .eq('participant_id', authUser.id)
-                .single();
+                .maybeSingle();
             if (error) throw error;
-            return data;
+            return data; // null if user hasn't joined this campaign yet
         },
     });
 

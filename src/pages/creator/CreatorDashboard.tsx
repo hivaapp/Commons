@@ -134,10 +134,10 @@ export default function CreatorDashboard() {
     const invitationList = invitations.data ?? [];
     const activeCampaignsCount = campaignList.length;
 
-    const totalEarned = statsData?.total_earned_paise ?? 0;
-    const communityEarned = statsData?.total_community_earned_paise ?? 0;
-    const activationRate = statsData?.activation_rate ?? 0;
-    const trustScore = statsData?.trust_score ?? 0;
+    const totalEarned = statsData?.total_earned ?? 0;
+    const communityEarned = statsData?.community_earned_total ?? 0;
+    const activationRate = Math.round((statsData?.avg_activation_rate ?? 0) * 100);
+    const trustScore = (statsData as any)?.trust_score ?? 0;
 
     const firstInvitation = invitationList[0];
 

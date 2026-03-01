@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Badge } from '../../components/ui/Badge';
 import { Button } from '../../components/ui/Button';
@@ -22,7 +22,7 @@ const statusBadge: Record<string, { variant: 'success' | 'warning' | 'neutral'; 
 
 const taskStatusMap: Record<string, { variant: 'success' | 'warning' | 'error' | 'neutral'; label: string }> = {
     approved: { variant: 'success', label: 'Approved' },
-    pending_review: { variant: 'warning', label: 'Pending' },
+    submitted: { variant: 'warning', label: 'Pending' },
     rejected: { variant: 'error', label: 'Rejected' },
     in_progress: { variant: 'neutral', label: 'In progress' },
 };
@@ -69,7 +69,7 @@ export default function CreatorCampaignDetail() {
 
     const c = campaign.data;
     const taskList = tasks.data ?? [];
-    const badge = statusBadge[c.status] ?? statusBadge.draft;
+    const badge = statusBadge[c.status ?? 'draft'] ?? statusBadge.draft;
     const brandName = (c.brand_profiles as any)?.company_name ?? 'Brand';
     const participants = c.current_participants ?? 0;
     const target = c.target_participants ?? 0;
@@ -77,7 +77,7 @@ export default function CreatorCampaignDetail() {
 
     // Stats
     const approvedCount = taskList.filter((t) => t.status === 'approved').length;
-    const pendingCount = taskList.filter((t) => t.status === 'pending_review').length;
+    const pendingCount = taskList.filter((t) => t.status === 'submitted').length;
     const rejectedCount = taskList.filter((t) => t.status === 'rejected').length;
     const inProgressCount = taskList.filter((t) => t.status === 'in_progress').length;
 
@@ -187,7 +187,7 @@ export default function CreatorCampaignDetail() {
                             {[
                                 { label: 'Campaign type', value: c.campaign_type ?? '—' },
                                 { label: 'Per task', value: formatRupeesExact(c.per_task_paise ?? 0) },
-                                { label: 'Estimated time', value: c.estimated_minutes ? `${c.estimated_minutes} min` : '—' },
+                                { label: 'Estimated time', value: c.task_duration_minutes ? `${c.task_duration_minutes} min` : '—' },
                                 { label: 'Ends', value: c.ends_at ? formatDate(c.ends_at) : '—' },
                             ].map((row) => (
                                 <div key={row.label} className="flex items-center justify-between">
@@ -226,7 +226,7 @@ export default function CreatorCampaignDetail() {
                         ) : (
                             <div className="divide-y divide-commons-border">
                                 {taskList.map((t, i) => {
-                                    const tBadge = taskStatusMap[t.status] ?? taskStatusMap.in_progress;
+                                    const tBadge = taskStatusMap[t.status ?? 'in_progress'] ?? taskStatusMap.in_progress;
                                     return (
                                         <div key={t.id} className="flex items-center gap-3 py-3">
                                             <span className="min-w-0 flex-1 truncate text-[14px] text-commons-text">
