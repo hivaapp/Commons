@@ -11,12 +11,16 @@ export function useSaveCampaignDraft() {
 
     return useMutation({
         mutationFn: async (data: Record<string, unknown> & { id?: string }) => {
-            if (data.id) {
+            // Strip generated columns that the DB computes automatically
+            const { platform_fee_paise: _pfp, ...cleanData } = data;
+
+            if (cleanData.id) {
                 // Update existing draft
+                const { id, ...updatePayload } = cleanData;
                 const { data: updated, error } = await supabase
                     .from('campaigns')
-                    .update({ ...data, updated_at: new Date().toISOString() })
-                    .eq('id', data.id)
+                    .update({ ...updatePayload, updated_at: new Date().toISOString() })
+                    .eq('id', id as string)
                     .eq('brand_id', user!.id)
                     .select()
                     .single();
@@ -26,7 +30,7 @@ export function useSaveCampaignDraft() {
                 // Create new draft
                 const { data: created, error } = await supabase
                     .from('campaigns')
-                    .insert({ ...data, brand_id: user!.id, status: 'draft' })
+                    .insert({ ...cleanData, brand_id: user!.id, status: 'draft' } as any)
                     .select()
                     .single();
                 if (error) throw error;
@@ -92,15 +96,17 @@ export function useInviteCreator() {
 export function useUpdateCampaignStatus() {
     const queryClient = useQueryClient();
 
+    type CampaignStatus = 'draft' | 'pending_review' | 'active' | 'paused' | 'completed' | 'cancelled';
+
     return useMutation({
-        mutationFn: async ({ campaignId, status }: { campaignId: string; status: string }) => {
+        mutationFn: async ({ campaignId, status }: { campaignId: string; status: CampaignStatus }) => {
             const { error } = await supabase
                 .from('campaigns')
                 .update({ status, updated_at: new Date().toISOString() })
                 .eq('id', campaignId);
             if (error) throw error;
         },
-        onSuccess: (_: unknown, { campaignId }: { campaignId: string; status: string }) => {
+        onSuccess: (_: unknown, { campaignId }: { campaignId: string; status: CampaignStatus }) => {
             queryClient.invalidateQueries({ queryKey: ['campaign', campaignId] });
             queryClient.invalidateQueries({ queryKey: ['brand-campaigns'] });
         },

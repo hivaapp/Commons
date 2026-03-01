@@ -13,16 +13,16 @@ import { useToast } from '../../components/ui/ToastProvider';
 
 // ---------- Types ----------
 
-type FilterKey = 'all' | 'Research' | 'Review' | 'Referral' | 'Content' | 'Beta Test' | 'Vote';
+type FilterKey = 'all' | 'research' | 'review' | 'referral' | 'content' | 'beta_test' | 'vote';
 
 const FILTER_CHIPS: { key: FilterKey; label: string }[] = [
     { key: 'all', label: 'All' },
-    { key: 'Research', label: 'Research' },
-    { key: 'Review', label: 'Review' },
-    { key: 'Referral', label: 'Referral' },
-    { key: 'Content', label: 'Content' },
-    { key: 'Beta Test', label: 'Beta Test' },
-    { key: 'Vote', label: 'Vote' },
+    { key: 'research', label: 'Research' },
+    { key: 'review', label: 'Review' },
+    { key: 'referral', label: 'Referral' },
+    { key: 'content', label: 'Content' },
+    { key: 'beta_test', label: 'Beta Test' },
+    { key: 'vote', label: 'Vote' },
 ];
 
 // ---------- Skeleton ----------
@@ -134,7 +134,7 @@ export default function CommunityDiscover() {
                                 <div className="mt-2 flex gap-3 text-[12px] text-commons-textMid">
                                     <span className="flex items-center gap-1">
                                         <Clock className="h-3 w-3" />
-                                        {c.estimated_minutes ?? '?'} min
+                                        {c.task_duration_minutes ?? '?'} min
                                     </span>
                                     <span className="flex items-center gap-1">
                                         <Users className="h-3 w-3" />

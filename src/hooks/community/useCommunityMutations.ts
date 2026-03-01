@@ -47,7 +47,7 @@ export function useSubmitTask() {
             proofUrls,
         }: {
             taskId: string;
-            responses: Record<string, unknown>;
+            responses: Record<string, string | number | boolean | null>;
             timeSpentSeconds: number;
             proofUrls?: string[];
         }) => {
@@ -55,7 +55,7 @@ export function useSubmitTask() {
             const { data, error } = await supabase
                 .from('tasks')
                 .update({
-                    status: 'pending_review',
+                    status: 'submitted',
                     responses,
                     time_spent_seconds: timeSpentSeconds,
                     proof_urls: proofUrls ?? [],
